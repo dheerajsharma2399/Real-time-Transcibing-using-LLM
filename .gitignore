@@ -17,3 +17,4 @@ pnpm-debug.log*
 .omx/hud-config.json
 .omx/setup-scope.json
 .omx/tmux-hook.json
+.omx/

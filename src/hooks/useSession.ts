@@ -231,11 +231,6 @@ export function useSession() {
 
       const apiKey = settings.groqApiKey.trim();
 
-      if (!apiKey) {
-        setIsSettingsOpen(true);
-        return;
-      }
-
       setIsRefreshing(true);
       setToastMessage('');
 
@@ -259,6 +254,8 @@ export function useSession() {
         if (!response.ok) {
           if (response.status === 401) {
             setIsSettingsOpen(true);
+            setToastMessage('No API key');
+            setTranscriptionError('No API key');
           }
 
           const payload = await response.json().catch(() => ({ error: 'Refresh failed' }));
@@ -273,8 +270,14 @@ export function useSession() {
           setToastMessage("Couldn't refresh suggestions");
         }
       } catch (error) {
-        setToastMessage('Transcription failed');
-        setTranscriptionError('Transcription failed');
+        if (!apiKey) {
+          setIsSettingsOpen(true);
+          setToastMessage('No API key');
+          setTranscriptionError('No API key');
+        } else {
+          setToastMessage('Transcription failed');
+          setTranscriptionError('Transcription failed');
+        }
       } finally {
         setIsRefreshing(false);
       }
@@ -301,11 +304,6 @@ export function useSession() {
       }
 
       const apiKey = settings.groqApiKey.trim();
-
-      if (!apiKey) {
-        setIsSettingsOpen(true);
-        return;
-      }
 
       setIsChatLoading(true);
       setToastMessage('');
@@ -346,6 +344,7 @@ export function useSession() {
         if (!response.ok) {
           if (response.status === 401) {
             setIsSettingsOpen(true);
+            setToastMessage('No API key');
           }
 
           const payload = await response.json().catch(() => ({ error: 'Chat failed' }));
@@ -362,7 +361,12 @@ export function useSession() {
           );
         });
       } catch (error) {
-        setToastMessage('Chat failed');
+        if (!apiKey) {
+          setIsSettingsOpen(true);
+          setToastMessage('No API key');
+        } else {
+          setToastMessage('Chat failed');
+        }
         setChatMessages((prev) =>
           prev.map((entry) =>
             entry.id === assistantMessageId ? { ...entry, content: 'Error — try again' } : entry
