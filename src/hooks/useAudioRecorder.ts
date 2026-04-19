@@ -84,6 +84,7 @@ export function useAudioRecorder({
       recorder.onstop = async () => {
         clearTimer();
         const audioEndMs = Date.now() - sessionStartRef.current;
+        const audioStartMs = chunkStartRef.current;
         const blob = new Blob(chunkBufferRef.current, { type: recorder.mimeType || 'audio/webm' });
         chunkBufferRef.current = [];
         const shouldRestart = shouldRestartRef.current && !!streamRef.current && !stopStreamAfterFlushRef.current;
@@ -97,7 +98,7 @@ export function useAudioRecorder({
           void Promise.resolve(
             onChunkReadyRef.current({
               blob,
-              audioStartMs: chunkStartRef.current,
+              audioStartMs,
               audioEndMs,
             })
           ).catch(() => undefined);

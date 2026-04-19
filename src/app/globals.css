@@ -362,6 +362,21 @@ button {
   font-size: 13px;
 }
 
+.toast {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 30;
+  max-width: 360px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  font-size: 13px;
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;

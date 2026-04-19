@@ -119,8 +119,18 @@ export function useSession() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [startedAt] = useState(() => Date.now());
-  const [lastError, setLastError] = useState('');
+  const [toastMessage, setToastMessage] = useState('');
+  const [transcriptionError, setTranscriptionError] = useState('');
   const [hasHydrated, setHasHydrated] = useState(false);
+
+  useEffect(() => {
+    if (!toastMessage) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => setToastMessage(''), 4500);
+    return () => window.clearTimeout(timer);
+  }, [toastMessage]);
 
   useEffect(() => {
     const initialSettings = readStoredSettings();
@@ -185,6 +195,7 @@ export function useSession() {
     }
 
     setTranscriptChunks((prev) => [...prev, chunk]);
+    setTranscriptionError('');
   }, []);
 
   const appendSuggestionBatch = useCallback((suggestions: Suggestion[]) => {
@@ -221,13 +232,12 @@ export function useSession() {
       const apiKey = settings.groqApiKey.trim();
 
       if (!apiKey) {
-        setLastError('No API key');
         setIsSettingsOpen(true);
         return;
       }
 
       setIsRefreshing(true);
-      setLastError('');
+      setToastMessage('');
 
       try {
         const formData = new FormData();
@@ -252,7 +262,7 @@ export function useSession() {
           }
 
           const payload = await response.json().catch(() => ({ error: 'Refresh failed' }));
-          throw new Error(payload.error || 'Refresh failed');
+          throw new Error(payload.error || 'Transcription failed');
         }
 
         const payload = (await response.json()) as RefreshResponse;
@@ -260,10 +270,11 @@ export function useSession() {
         appendSuggestionBatch(payload.suggestions);
 
         if (payload.transcriptChunk?.text?.trim() && payload.suggestions.length === 0) {
-          setLastError("Couldn't refresh suggestions");
+          setToastMessage("Couldn't refresh suggestions");
         }
       } catch (error) {
-        setLastError(error instanceof Error ? error.message : 'Refresh failed');
+        setToastMessage('Transcription failed');
+        setTranscriptionError('Transcription failed');
       } finally {
         setIsRefreshing(false);
       }
@@ -292,13 +303,12 @@ export function useSession() {
       const apiKey = settings.groqApiKey.trim();
 
       if (!apiKey) {
-        setLastError('No API key');
         setIsSettingsOpen(true);
         return;
       }
 
       setIsChatLoading(true);
-      setLastError('');
+      setToastMessage('');
 
       const userMessage: ChatMessage = {
         id: createId(),
@@ -352,11 +362,10 @@ export function useSession() {
           );
         });
       } catch (error) {
-        const message = error instanceof Error ? error.message : 'Chat failed';
-        setLastError(message);
+        setToastMessage('Chat failed');
         setChatMessages((prev) =>
           prev.map((entry) =>
-            entry.id === assistantMessageId ? { ...entry, content: `Error: ${message}` } : entry
+            entry.id === assistantMessageId ? { ...entry, content: 'Error — try again' } : entry
           )
         );
       } finally {
@@ -400,7 +409,8 @@ export function useSession() {
     useSuggestionInChat,
     exportSession,
     startedAt,
-    lastError,
+    toastMessage,
+    transcriptionError,
     hasHydrated,
   };
 }

@@ -27,7 +27,8 @@ export default function HomePage() {
     useSuggestionInChat,
     exportSession,
     startedAt,
-    lastError,
+    toastMessage,
+    transcriptionError,
     hasHydrated,
   } = useSession();
 
@@ -52,7 +53,6 @@ export default function HomePage() {
           </div>
 
           <div className="topbar-actions">
-            {lastError ? <span className="status-error">{lastError}</span> : null}
             <button
               className="secondary-button"
               type="button"
@@ -75,6 +75,7 @@ export default function HomePage() {
             isRecording={isRecording}
             onStart={startRecording}
             onStop={stopRecording}
+            transcriptionError={transcriptionError}
           />
           <SuggestionsPanel
             suggestionBatches={suggestionBatches}
@@ -95,6 +96,8 @@ export default function HomePage() {
         onClose={() => setIsSettingsOpen(false)}
         onSave={saveSettings}
       />
+
+      {toastMessage ? <div className="toast">{toastMessage}</div> : null}
     </>
   );
 }

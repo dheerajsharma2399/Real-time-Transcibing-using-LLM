@@ -9,6 +9,7 @@ type TranscriptPanelProps = {
   isRecording: boolean;
   onStart: () => Promise<void> | void;
   onStop: () => void;
+  transcriptionError: string;
 };
 
 export function TranscriptPanel({
@@ -16,6 +17,7 @@ export function TranscriptPanel({
   isRecording,
   onStart,
   onStop,
+  transcriptionError,
 }: TranscriptPanelProps) {
   const [micError, setMicError] = useState('');
   const [micDisabled, setMicDisabled] = useState(false);
@@ -59,6 +61,7 @@ export function TranscriptPanel({
       </button>
 
       {micError ? <div className="inline-error">{micError}</div> : null}
+      {transcriptionError ? <div className="inline-error">{transcriptionError}</div> : null}
 
       <div className="callout">
         The transcript scrolls and appends new chunks every ~30 seconds while recording. Use the mic
