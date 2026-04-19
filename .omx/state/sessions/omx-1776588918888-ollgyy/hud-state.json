@@ -1,0 +1,6 @@
+{
+  "last_turn_at": "2026-04-19T09:02:05.070Z",
+  "last_progress_at": "2026-04-19T09:02:05.070Z",
+  "turn_count": 1,
+  "last_agent_output": "Used `$ask-gemini` to sanity-check the spec and produce a build plan (artifact saved under `.omx/art"
+}

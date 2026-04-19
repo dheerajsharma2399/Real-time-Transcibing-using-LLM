@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "active": false,
+  "skill": "autopilot",
+  "keyword": "$autopilot",
+  "phase": "planning",
+  "activated_at": "2026-04-17T17:14:40.832Z",
+  "updated_at": "2026-04-17T17:17:48.458Z",
+  "source": "keyword-detector",
+  "session_id": "omx-1776446035796-g1g5z4",
+  "turn_id": "019d9c70-064e-7af2-a7d2-52c7e30bce44",
+  "active_skills": [],
+  "initialized_mode": "autopilot",
+  "initialized_state_path": ".omx/state/sessions/omx-1776446035796-g1g5z4/autopilot-state.json"
+}

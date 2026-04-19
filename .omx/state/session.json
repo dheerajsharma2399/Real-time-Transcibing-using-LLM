@@ -1,0 +1,10 @@
+{
+  "session_id": "omx-1776588918888-ollgyy",
+  "native_session_id": "019da4ef-6cae-7e22-9318-c78049e59212",
+  "started_at": "2026-04-19T08:55:18.944Z",
+  "cwd": "/home/ubuntu/projects/twinmind",
+  "pid": 1317407,
+  "platform": "linux",
+  "pid_start_ticks": 110431793,
+  "pid_cmdline": "/home/ubuntu/.hermes/node/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-arm64/vendor/aarch64-unknown-linux-musl/codex/codex --dangerously-bypass-approvals-and-sandbox -c model_instructions_file=\"/home/ubuntu/projects/twinmind/.omx/state/sessions/omx-1776588918888-ollgyy/AGENTS.md\""
+}

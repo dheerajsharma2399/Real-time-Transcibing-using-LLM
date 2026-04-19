@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "active": true,
+  "skill": "autopilot",
+  "keyword": "$autopilot",
+  "phase": "execution",
+  "activated_at": "2026-04-17T17:04:18.763Z",
+  "updated_at": "2026-04-17T17:04:18.763Z",
+  "source": "keyword-detector",
+  "session_id": "019d9c66-0fa7-7d20-8839-714bbc0ed067",
+  "turn_id": "019d9c5d-d5c8-7862-ad73-ecf117e6a88d",
+  "active_skills": [
+    {
+      "skill": "autopilot",
+      "phase": "execution",
+      "active": true,
+      "activated_at": "2026-04-17T17:04:18.763Z",
+      "updated_at": "2026-04-17T17:04:18.763Z",
+      "session_id": "019d9c66-0fa7-7d20-8839-714bbc0ed067"
+    }
+  ],
+  "initialized_mode": "autopilot",
+  "initialized_state_path": ".omx/state/sessions/omx-1776444815412-iazq0k/autopilot-state.json"
+}

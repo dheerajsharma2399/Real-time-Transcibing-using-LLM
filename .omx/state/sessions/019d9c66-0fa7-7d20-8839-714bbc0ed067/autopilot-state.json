@@ -1,0 +1,17 @@
+{
+  "active": true,
+  "current_phase": "execution",
+  "started_at": "2026-04-17T16:53:35.941Z",
+  "task_description": "Implement server/shared slice from IMPLEMENTATION_PLAN.md and image.png: src/lib/** and src/app/api/** routes for transcribe, suggestions, chat, refresh; consult Gemini CLI and verify.",
+  "owner_scope": [
+    "src/hooks/**",
+    "src/components/**",
+    "src/app/page.tsx",
+    "src/app/globals.css"
+  ],
+  "source_of_truth": [
+    "IMPLEMENTATION_PLAN.md",
+    "image.png"
+  ],
+  "ownership": "src/lib/** and src/app/api/** only"
+}
