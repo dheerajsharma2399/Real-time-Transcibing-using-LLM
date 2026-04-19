@@ -1,11 +1,13 @@
 'use client';
 
+import { useCallback, useState } from 'react';
+
 import { TranscriptChunk } from '@/lib/types';
 
 type TranscriptPanelProps = {
   transcriptChunks: TranscriptChunk[];
   isRecording: boolean;
-  onStart: () => void;
+  onStart: () => Promise<void> | void;
   onStop: () => void;
 };
 
@@ -15,6 +17,35 @@ export function TranscriptPanel({
   onStart,
   onStop,
 }: TranscriptPanelProps) {
+  const [micError, setMicError] = useState('');
+  const [micDisabled, setMicDisabled] = useState(false);
+
+  const handleMicClick = useCallback(async () => {
+    if (isRecording) {
+      onStop();
+      return;
+    }
+
+    if (micDisabled) {
+      return;
+    }
+
+    try {
+      await onStart();
+      setMicError('');
+    } catch (error) {
+      const name = error && typeof error === 'object' && 'name' in error ? String((error as { name?: unknown }).name) : '';
+      const isDenied = name === 'NotAllowedError' || name === 'PermissionDeniedError';
+
+      if (isDenied) {
+        setMicError('Mic permission denied');
+        setMicDisabled(true);
+      } else {
+        setMicError('Unable to access microphone');
+      }
+    }
+  }, [isRecording, micDisabled, onStart, onStop]);
+
   return (
     <section className="panel column">
       <div className="panel-heading">
@@ -22,10 +53,12 @@ export function TranscriptPanel({
         <span>{isRecording ? 'RECORDING' : 'IDLE'}</span>
       </div>
 
-      <button className="mic-button" type="button" onClick={isRecording ? onStop : onStart}>
+      <button className="mic-button" type="button" onClick={handleMicClick} disabled={!isRecording && micDisabled}>
         <span className="mic-dot" />
         <span>{isRecording ? 'Stop mic' : 'Click mic to start. Transcript appends every ~30s.'}</span>
       </button>
+
+      {micError ? <div className="inline-error">{micError}</div> : null}
 
       <div className="callout">
         The transcript scrolls and appends new chunks every ~30 seconds while recording. Use the mic

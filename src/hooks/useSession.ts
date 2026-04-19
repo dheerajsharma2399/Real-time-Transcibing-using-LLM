@@ -218,6 +218,14 @@ export function useSession() {
         return;
       }
 
+      const apiKey = settings.groqApiKey.trim();
+
+      if (!apiKey) {
+        setLastError('No API key');
+        setIsSettingsOpen(true);
+        return;
+      }
+
       setIsRefreshing(true);
       setLastError('');
 
@@ -234,11 +242,15 @@ export function useSession() {
 
         const response = await fetch('/api/refresh', {
           method: 'POST',
-          headers: createHeaders(settings.groqApiKey),
+          headers: createHeaders(apiKey),
           body: formData,
         });
 
         if (!response.ok) {
+          if (response.status === 401) {
+            setIsSettingsOpen(true);
+          }
+
           const payload = await response.json().catch(() => ({ error: 'Refresh failed' }));
           throw new Error(payload.error || 'Refresh failed');
         }
@@ -246,6 +258,10 @@ export function useSession() {
         const payload = (await response.json()) as RefreshResponse;
         appendTranscriptChunk(payload.transcriptChunk);
         appendSuggestionBatch(payload.suggestions);
+
+        if (payload.transcriptChunk?.text?.trim() && payload.suggestions.length === 0) {
+          setLastError("Couldn't refresh suggestions");
+        }
       } catch (error) {
         setLastError(error instanceof Error ? error.message : 'Refresh failed');
       } finally {
@@ -270,6 +286,14 @@ export function useSession() {
       const trimmedContent = content.trim();
 
       if (!trimmedContent || isChatLoading) {
+        return;
+      }
+
+      const apiKey = settings.groqApiKey.trim();
+
+      if (!apiKey) {
+        setLastError('No API key');
+        setIsSettingsOpen(true);
         return;
       }
 
@@ -300,7 +324,7 @@ export function useSession() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...createHeaders(settings.groqApiKey),
+            ...createHeaders(apiKey),
           },
           body: JSON.stringify({
             messages: nextMessages,
@@ -310,6 +334,10 @@ export function useSession() {
         });
 
         if (!response.ok) {
+          if (response.status === 401) {
+            setIsSettingsOpen(true);
+          }
+
           const payload = await response.json().catch(() => ({ error: 'Chat failed' }));
           throw new Error(payload.error || 'Chat failed');
         }

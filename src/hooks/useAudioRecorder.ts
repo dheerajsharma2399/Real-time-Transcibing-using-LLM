@@ -34,6 +34,8 @@ export function useAudioRecorder({
   refreshIntervalSeconds,
 }: UseAudioRecorderOptions) {
   const [isRecording, setIsRecording] = useState(false);
+  const onChunkReadyRef = useRef(onChunkReady);
+  const refreshIntervalSecondsRef = useRef(refreshIntervalSeconds);
   const streamRef = useRef<MediaStream | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const timerRef = useRef<number | null>(null);
@@ -43,6 +45,14 @@ export function useAudioRecorder({
   const shouldRestartRef = useRef(false);
   const stopStreamAfterFlushRef = useRef(false);
   const isStartingRef = useRef(false);
+
+  useEffect(() => {
+    onChunkReadyRef.current = onChunkReady;
+  }, [onChunkReady]);
+
+  useEffect(() => {
+    refreshIntervalSecondsRef.current = refreshIntervalSeconds;
+  }, [refreshIntervalSeconds]);
 
   const clearTimer = useCallback(() => {
     if (timerRef.current !== null) {
@@ -76,13 +86,21 @@ export function useAudioRecorder({
         const audioEndMs = Date.now() - sessionStartRef.current;
         const blob = new Blob(chunkBufferRef.current, { type: recorder.mimeType || 'audio/webm' });
         chunkBufferRef.current = [];
+        const shouldRestart = shouldRestartRef.current && !!streamRef.current && !stopStreamAfterFlushRef.current;
+        const nextStream = streamRef.current;
+
+        if (shouldRestart && nextStream) {
+          startRecorderCycle(nextStream);
+        }
 
         if (blob.size > 1000) {
-          await onChunkReady({
-            blob,
-            audioStartMs: chunkStartRef.current,
-            audioEndMs,
-          });
+          void Promise.resolve(
+            onChunkReadyRef.current({
+              blob,
+              audioStartMs: chunkStartRef.current,
+              audioEndMs,
+            })
+          ).catch(() => undefined);
         }
 
         if (stopStreamAfterFlushRef.current) {
@@ -93,8 +111,7 @@ export function useAudioRecorder({
           return;
         }
 
-        if (shouldRestartRef.current && streamRef.current) {
-          startRecorderCycle(streamRef.current);
+        if (shouldRestart) {
           return;
         }
 
@@ -110,9 +127,9 @@ export function useAudioRecorder({
           shouldRestartRef.current = true;
           recorder.stop();
         }
-      }, refreshIntervalSeconds * 1000);
+      }, refreshIntervalSecondsRef.current * 1000);
     },
-    [clearTimer, onChunkReady, refreshIntervalSeconds, stopTracks]
+    [clearTimer, stopTracks]
   );
 
   const startRecording = useCallback(async () => {

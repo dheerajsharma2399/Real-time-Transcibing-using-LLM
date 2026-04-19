@@ -1,8 +1,0 @@
-{
-  "current_phase": "qa",
-  "task_slug": "twinmind-live-suggestions",
-  "context_snapshot_path": ".omx/context/twinmind-live-suggestions-20260417T165700Z.md",
-  "build_status": "passed",
-  "npm_install": "completed",
-  "qa_cycle": 1
-}

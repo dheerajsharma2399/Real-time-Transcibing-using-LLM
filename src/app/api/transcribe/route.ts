@@ -17,6 +17,10 @@ function getAudioFile(formData: FormData) {
   return value;
 }
 
+function sleep(ms: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, ms));
+}
+
 export async function POST(request: Request) {
   const apiKey = getApiKey(request);
 
@@ -32,25 +36,36 @@ export async function POST(request: Request) {
       return Response.json({ text: '' });
     }
 
-    const payload = new FormData();
-    payload.append('file', audio);
-    payload.append('model', 'whisper-large-v3');
+    const attempt = async () => {
+      const payload = new FormData();
+      payload.append('file', audio);
+      payload.append('model', 'whisper-large-v3');
 
-    const response = await fetch(`${GROQ_API_BASE_URL}/audio/transcriptions`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: payload,
-    });
+      const response = await fetch(`${GROQ_API_BASE_URL}/audio/transcriptions`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: payload,
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText || 'Transcription failed');
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Transcription failed');
+      }
+
+      const transcription = await response.json();
+      return typeof transcription?.text === 'string' ? transcription.text : '';
+    };
+
+    let text = '';
+
+    try {
+      text = await attempt();
+    } catch (_error) {
+      await sleep(2000);
+      text = await attempt();
     }
-
-    const transcription = await response.json();
-    const text = typeof transcription?.text === 'string' ? transcription.text : '';
 
     return Response.json({ text });
   } catch (error) {

@@ -7,3 +7,13 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+*.tsbuildinfo
+
+# OMX runtime state (keep plans/artifacts committed, but ignore volatile state/logs)
+.omx/state
+.omx/logs
+.omx/notepad.md
+.omx/metrics.json
+.omx/hud-config.json
+.omx/setup-scope.json
+.omx/tmux-hook.json

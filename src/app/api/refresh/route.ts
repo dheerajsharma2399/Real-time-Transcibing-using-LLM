@@ -79,29 +79,42 @@ function parseJsonObject(value: string) {
   }
 }
 
+function sleep(ms: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, ms));
+}
+
 async function transcribeAudio(audio: File, apiKey: string) {
   if (audio.size < 1000) {
     return '';
   }
 
-  const payload = new FormData();
-  payload.append('file', audio);
-  payload.append('model', 'whisper-large-v3');
+  const attempt = async () => {
+    const payload = new FormData();
+    payload.append('file', audio);
+    payload.append('model', 'whisper-large-v3');
 
-  const response = await fetch(`${GROQ_API_BASE_URL}/audio/transcriptions`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: payload,
-  });
+    const response = await fetch(`${GROQ_API_BASE_URL}/audio/transcriptions`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: payload,
+    });
 
-  if (!response.ok) {
-    throw new Error((await response.text()) || 'Transcription failed');
+    if (!response.ok) {
+      throw new Error((await response.text()) || 'Transcription failed');
+    }
+
+    const transcription = await response.json();
+    return typeof transcription?.text === 'string' ? transcription.text.trim() : '';
+  };
+
+  try {
+    return await attempt();
+  } catch (_error) {
+    await sleep(2000);
+    return await attempt();
   }
-
-  const transcription = await response.json();
-  return typeof transcription?.text === 'string' ? transcription.text.trim() : '';
 }
 
 async function generateSuggestions(
@@ -198,8 +211,11 @@ export async function POST(request: Request) {
     const combinedRecentWindow = [recentWindow, transcriptText].filter(Boolean).join('\n').slice(-500);
     const combinedChunkIds = [...previousChunkIds, transcriptChunk.id];
 
-    const suggestions = transcriptText
-      ? await generateSuggestions(
+    let suggestions = [] as Awaited<ReturnType<typeof generateSuggestions>>;
+
+    if (transcriptText) {
+      try {
+        suggestions = await generateSuggestions(
           apiKey,
           interpolateTemplate(suggestionPrompt || DEFAULT_SUGGESTION_PROMPT, {
             transcriptWindow: combinedTranscriptWindow || transcriptText,
@@ -207,10 +223,13 @@ export async function POST(request: Request) {
             previousTitles: previousTitles.length ? previousTitles.join('\n') : 'None',
           }),
           combinedChunkIds
-        )
-      : [];
+        );
+      } catch (_error) {
+        suggestions = [];
+      }
+    }
 
-    return Response.json<RefreshResponse>({
+    return Response.json({
       transcriptChunk: transcriptText ? transcriptChunk : null,
       suggestions,
     });
