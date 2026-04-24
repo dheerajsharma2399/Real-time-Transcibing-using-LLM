@@ -61,14 +61,15 @@ The container image follows the standalone Next.js output flow from `IMPLEMENTAT
    ```bash
    docker compose up --build
    ```
-4. Visit `http://localhost:3000`.
+4. Visit `http://localhost:43873`.
 
 The Docker image expects a committed `package-lock.json` because the Dockerfile uses `npm ci` for reproducible installs.
 
 ## Dokploy notes
 
 - Deploy with the included `Dockerfile` / `docker-compose.yml`.
-- Expose port `3000`.
+- The compose file publishes host port `43873` to the app's internal port `3000` to avoid common host-port conflicts like `3000` already being allocated.
+- If configuring Dokploy proxy routing, point it at container/internal port `3000`; direct host access uses port `43873`.
 - Set `GROQ_API_KEY` in Dokploy environment variables unless your client always sends `x-groq-key`.
 - The app is serverful and requires outbound HTTPS access to Groq.
 
