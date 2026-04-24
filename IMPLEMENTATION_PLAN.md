@@ -453,23 +453,26 @@ RUN npm run build
 FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
+ENV PORT=3008
+ENV HOSTNAME=0.0.0.0
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
-EXPOSE 3000
+EXPOSE 3008
 CMD ["node", "server.js"]
 ```
 
 ### `docker-compose.yml`
 ```yaml
-version: '3.8'
 services:
   twinmind:
     build: .
     ports:
-      - "3000:3000"
+      - "3008:3008"
     environment:
       - GROQ_API_KEY=${GROQ_API_KEY}
+      - PORT=3008
+      - HOSTNAME=0.0.0.0
     restart: unless-stopped
 ```
 

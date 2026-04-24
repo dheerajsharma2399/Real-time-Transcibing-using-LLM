@@ -35,7 +35,7 @@ If neither is present, the API returns `401 { "error": "No API key" }`.
    ```bash
    npm run dev
    ```
-5. Open `http://localhost:3000`.
+5. Open `http://localhost:3008`.
 
 ## Production build
 
@@ -43,6 +43,8 @@ If neither is present, the API returns `401 { "error": "No API key" }`.
 npm run build
 npm run start
 ```
+
+Both `npm run dev` and `npm run start` listen on port `3008`.
 
 `next.config.js` uses `output: 'standalone'` so Docker can run the generated `server.js` entrypoint.
 
