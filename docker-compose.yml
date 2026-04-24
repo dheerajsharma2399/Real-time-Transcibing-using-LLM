@@ -2,7 +2,9 @@ services:
   twinmind:
     build: .
     ports:
-      - "43873:3000"
+      - "3008:3008"
     environment:
       - GROQ_API_KEY=${GROQ_API_KEY}
+      - PORT=3008
+      - HOSTNAME=0.0.0.0
     restart: unless-stopped
