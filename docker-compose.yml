@@ -1,10 +1,24 @@
 services:
   twinmind:
     build: .
-    ports:
-      - "3008:3008"
     environment:
       - GROQ_API_KEY=${GROQ_API_KEY}
       - PORT=3008
       - HOSTNAME=0.0.0.0
     restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=dokploy-network
+      - traefik.http.routers.twinmind-web.rule=Host(`twinmind.yaml.codes`)
+      - traefik.http.routers.twinmind-web.entrypoints=web
+      - traefik.http.routers.twinmind-web.middlewares=redirect-to-https@file
+      - traefik.http.routers.twinmind.rule=Host(`twinmind.yaml.codes`)
+      - traefik.http.routers.twinmind.entrypoints=websecure
+      - traefik.http.routers.twinmind.tls=true
+      - traefik.http.services.twinmind.loadbalancer.server.port=3008
+    networks:
+      - dokploy-network
+
+networks:
+  dokploy-network:
+    external: true

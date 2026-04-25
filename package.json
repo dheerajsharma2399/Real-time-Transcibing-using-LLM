@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3008",
+    "dev": "next dev -H 0.0.0.0 -p 3008",
     "build": "next build",
-    "start": "next start -p 3008"
+    "start": "HOSTNAME=0.0.0.0 PORT=3008 node .next/standalone/server.js"
   },
   "dependencies": {
     "groq-sdk": "^0.16.0",
