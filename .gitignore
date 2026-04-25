@@ -18,3 +18,26 @@ pnpm-debug.log*
 .omx/setup-scope.json
 .omx/tmux-hook.json
 .omx/
+
+# Local environment secrets
+.env.local
+.env.*.local
+
+# OMX / agent runtime artifacts
+.agents/
+.codex/
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+
+# Build and runtime artifacts
+.next/
+out/
+dist/
+coverage/
+*.log
+.claude/
+.gemini/
+.cursor/
+.aider*
+.serena/
